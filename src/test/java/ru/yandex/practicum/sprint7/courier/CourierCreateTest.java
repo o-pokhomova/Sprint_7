@@ -9,34 +9,34 @@ import ru.yandex.practicum.sprint7.steps.CourierSteps;
 
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.equalTo;
 
 @DisplayName("Создание курьера")
 public class CourierCreateTest {
-    public static final String COURIER_LOGIN = "vasyapupkin";
     public static final String COURIER_PASSWORD = "strongpassword";
     public static final String COURIER_FIRST_NAME = "Вася";
 
+    public final String courierLogin = UUID.randomUUID().toString();
     private final CourierSteps courierSteps = new CourierSteps();
 
     @Before
     public void setUp() {
-        // Тут удаляем курьера, потому что предыдущий запуск тестов мог
-        // быть прерван и оставить после себя данные.
-        courierSteps.cleanupCourier(COURIER_LOGIN, COURIER_PASSWORD);
+        System.out.println("Courier login is " + courierLogin);
     }
 
     @After
     public void tearDown() {
         // Тут убираем за собой
-        courierSteps.cleanupCourier(COURIER_LOGIN, COURIER_PASSWORD);
+        courierSteps.cleanupCourier(courierLogin, COURIER_PASSWORD);
     }
 
     @DisplayName("Создать курьера")
     @Description("Создание курьера в системе")
     @Test
     public void create() {
-        courierSteps.create(COURIER_LOGIN, COURIER_PASSWORD, COURIER_FIRST_NAME)
+        courierSteps.create(courierLogin, COURIER_PASSWORD, COURIER_FIRST_NAME)
                 .then()
                 .statusCode(HttpServletResponse.SC_CREATED)
                 .assertThat()
@@ -48,9 +48,9 @@ public class CourierCreateTest {
     @Test
     public void createTwice() {
         // Создаём курьера в первый раз
-        courierSteps.create(COURIER_LOGIN, COURIER_PASSWORD, COURIER_FIRST_NAME);
+        courierSteps.create(courierLogin, COURIER_PASSWORD, COURIER_FIRST_NAME);
         // Повторно создаём курьера
-        courierSteps.create(COURIER_LOGIN, COURIER_PASSWORD, COURIER_FIRST_NAME)
+        courierSteps.create(courierLogin, COURIER_PASSWORD, COURIER_FIRST_NAME)
                 .then()
                 .statusCode(HttpServletResponse.SC_CONFLICT)
                 .assertThat()
@@ -72,7 +72,7 @@ public class CourierCreateTest {
     @Description("Создание курьера в системе без указания обязательного поля: пароль")
     @Test
     public void createNoPassword() {
-        courierSteps.create(COURIER_LOGIN, null, COURIER_FIRST_NAME)
+        courierSteps.create(courierLogin, null, COURIER_FIRST_NAME)
                 .then()
                 .statusCode(HttpServletResponse.SC_BAD_REQUEST)
                 .assertThat()

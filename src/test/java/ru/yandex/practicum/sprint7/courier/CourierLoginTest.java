@@ -9,31 +9,28 @@ import ru.yandex.practicum.sprint7.steps.CourierSteps;
 
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.*;
 
 @DisplayName("Вход курьера в систему")
 public class CourierLoginTest {
-    public static final String COURIER_LOGIN = "vasyapupkin";
     public static final String COURIER_PASSWORD = "strongpassword";
 
+    public final String courierLogin = UUID.randomUUID().toString();
     private final CourierSteps courierSteps = new CourierSteps();
 
 
     @Before
     public void setUp() {
-        // Тут удаляем курьера, потому что предыдущий запуск тестов мог
-        // быть прерван и оставить после себя данные.
-        // Нельзя просто создать его, потому что если курьер существует, но пароль
-        // не совпадает, должен упасть не тест, а этот метод
-        courierSteps.cleanupCourier(COURIER_LOGIN, COURIER_PASSWORD);
-
-        courierSteps.create(COURIER_LOGIN, COURIER_PASSWORD, null);
+        System.out.println("Courier login is " + courierLogin);
+        courierSteps.create(courierLogin, COURIER_PASSWORD, null);
     }
 
     @After
     public void tearDown() {
         // Тут убираем за собой
-        courierSteps.cleanupCourier(COURIER_LOGIN, COURIER_PASSWORD);
+        courierSteps.cleanupCourier(courierLogin, COURIER_PASSWORD);
     }
 
 
@@ -41,7 +38,7 @@ public class CourierLoginTest {
     @Description("Вход курьера в систему с логином и паролем")
     @Test
     public void login() {
-        courierSteps.login(COURIER_LOGIN, COURIER_PASSWORD)
+        courierSteps.login(courierLogin, COURIER_PASSWORD)
                 .then()
                 .statusCode(HttpServletResponse.SC_OK)
                 .body("id", anyOf(
@@ -64,7 +61,7 @@ public class CourierLoginTest {
     @Description("Вход курьера в систему без указания пароля")
     @Test
     public void loginNoPassword() {
-        courierSteps.login(COURIER_LOGIN, null)
+        courierSteps.login(courierLogin, null)
                 .then()
                 .statusCode(HttpServletResponse.SC_BAD_REQUEST)
                 .body("message", equalTo("Недостаточно данных для входа"));
@@ -74,7 +71,7 @@ public class CourierLoginTest {
     @Description("Вход курьера в систему с паролем, который не совпадает с настоящим паролем пользователя")
     @Test
     public void incorrectPassword() {
-        courierSteps.login(COURIER_LOGIN, "blah-blah-blah")
+        courierSteps.login(courierLogin, "blah-blah-blah")
                 .then()
                 .statusCode(HttpServletResponse.SC_NOT_FOUND)
                 .body("message", equalTo("Учетная запись не найдена"));

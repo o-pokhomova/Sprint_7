@@ -3,6 +3,7 @@ package ru.yandex.practicum.sprint7.order;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -25,6 +26,7 @@ public class OrderCreateTest {
 
     private final OrderSteps orderSteps;
     private final List<String> color;
+    private Response order;
 
     public OrderCreateTest(List<String> color) {
         this.orderSteps = new OrderSteps();
@@ -42,11 +44,17 @@ public class OrderCreateTest {
         };
     }
 
+    @After
+    public void tearDown() {
+        TrackIdDto track = order.body().as(TrackIdDto.class);
+        orderSteps.cancel(track.getTrack());
+    }
+
     @DisplayName("Создать заказ")
     @Description("Создание заказа в системе. Параметризуется списком цветов.")
     @Test
     public void createOrder() {
-        Response order = orderSteps.createOrder(color);
+        order = orderSteps.createOrder(color);
         order
                 .then()
                 .statusCode(HttpServletResponse.SC_CREATED)
@@ -54,8 +62,5 @@ public class OrderCreateTest {
                         isA(Long.class),
                         isA(Integer.class)
                 ));
-
-        TrackIdDto track = order.body().as(TrackIdDto.class);
-        orderSteps.cancel(track.getTrack());
     }
 }

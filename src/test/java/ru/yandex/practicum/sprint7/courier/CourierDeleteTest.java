@@ -10,30 +10,28 @@ import ru.yandex.practicum.sprint7.dto.courier.IdDto;
 import ru.yandex.practicum.sprint7.steps.CourierSteps;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.UUID;
 
 @DisplayName("Удаление курьера")
 public class CourierDeleteTest {
-    public static final String COURIER_LOGIN = "vasyapupkin";
     public static final String COURIER_PASSWORD = "strongpassword";
+
     private final CourierSteps courierSteps = new CourierSteps();
+    public final String courierLogin = UUID.randomUUID().toString();
+
     private IdDto courierId;
 
     @Before
     public void setUp() {
-        // Тут удаляем курьера, потому что предыдущий запуск тестов мог
-        // быть прерван и оставить после себя данные.
-        // Нельзя просто создать его, потому что если курьер существует, но пароль
-        // не совпадает, должен упасть не тест, а этот метод
-        courierSteps.cleanupCourier(COURIER_LOGIN, COURIER_PASSWORD);
-
-        courierSteps.create(COURIER_LOGIN, COURIER_PASSWORD, null);
-        courierId = courierSteps.login(COURIER_LOGIN, COURIER_PASSWORD).body().as(IdDto.class);
+        System.out.println("Courier login is " + courierLogin);
+        courierSteps.create(courierLogin, COURIER_PASSWORD, null);
+        courierId = courierSteps.login(courierLogin, COURIER_PASSWORD).body().as(IdDto.class);
     }
 
     @After
     public void tearDown() {
         // Тут убираем за собой
-        courierSteps.cleanupCourier(COURIER_LOGIN, COURIER_PASSWORD);
+        courierSteps.cleanupCourier(courierLogin, COURIER_PASSWORD);
     }
 
     @DisplayName("Удаление курьера")
